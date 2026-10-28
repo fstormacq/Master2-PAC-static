@@ -1,94 +1,69 @@
+// This file was formatted with the help of agentic AI.
+
 grammar SmallGrammar;
 
-/*
- * Lexer Rules
- */
+// ============================================================================
+// Lexer rules
+// ============================================================================
 
-// Keywords
+// --- Keywords ---------------------------------------------------------------
 
-IF: 'if';
+IF            : 'if';
+ELSE          : 'else';
+WHILE         : 'while';
+FUNCTION      : 'function';
+RETURN        : 'return';
 
-ELSE: 'else';
+// --- Separators and punctuation --------------------------------------------
 
-WHILE: 'while';
+LBRACE        : '{';
+RBRACE        : '}';
+LPAR          : '(';
+RPAR          : ')';
+COMMA         : ',';
+SEMICOLON     : ';';
 
-FUNCTION: 'function';
+// --- Operators --------------------------------------------------------------
 
-RETURN: 'return';
+ASSIGN        : '=';
+AND           : 'and';
+OR            : 'or';
+ADD           : '+';
+SUBSTRACT     : '-';
+MULTIPLY      : '*';
+DIVIDE        : '/';
+GREATER       : '>';
+GREATER_EQUAL : '>=';
+LESS          : '<';
+LESS_EQUAL    : '<=';
+EQUAL         : '==';
+NOT_EQUAL     : '!=';
 
-// Separators / Punctuators
+// --- Literals ---------------------------------------------------------------
 
-LBRACE: '{';
-
-RBRACE: '}';
-
-LPAR: '(';
-
-RPAR: ')';
-
-COMMA: ',';
-
-SEMICOLON: ';';
-
-// Operators
-
-ASSIGN: '=';
-
-AND: 'and';
-
-OR: 'or';
-
-ADD: '+';
-
-SUBSTRACT: '-';
-
-MULTIPLY: '*';
-
-DIVIDE: '/';
-
-GREATER: '>';
-
-GREATER_EQUAL: '>=';
-
-LESS: '<';
-
-LESS_EQUAL: '<=';
-
-EQUAL: '==';
-
-NOT_EQUAL: '!=';
-
-// Literals
-
-TRUE: 'True';
-
-FALSE: 'False';
+TRUE          : 'True';
+FALSE         : 'False';
 
 fragment DIGIT: [0-9];
+NUM           : DIGIT+;
 
-NUM: DIGIT+;
-
-// Identifiers
+// --- Identifiers ------------------------------------------------------------
 
 fragment LETTER: [a-zA-Z];
+IDENTIFIER    : LETTER (LETTER | DIGIT)*;
 
-IDENTIFIER: LETTER (LETTER | DIGIT)*;
+// --- Ignored comments and whitespace ---------------------------------------
 
-// Comments -> ignored
+COMMENT       : ('/*' (.*?) '*/' | '//' .*? '\r'? ('\n' | EOF)) -> skip;
 
-COMMENT: ('/*' (.*?) '*/' | '//' .*? '\r'? ('\n' | EOF)) -> skip;
+NEWLINE       : '\r'? '\n' -> skip;
+WS            : [ \t]+ -> skip;
 
-// Whitespaces -> ignored
+// ============================================================================
+// Parser rules
+// ============================================================================
 
-NEWLINE: '\r'? '\n' -> skip;
-
-WS: [ \t]+ -> skip;
-
-/*
- * Parser Rules
- */
-
-// Program
+// --- Program ----------------------------------------------------------------
 
 program: function*;
 
@@ -96,11 +71,16 @@ function: FUNCTION IDENTIFIER LPAR parameters RPAR body;
 
 parameters: (IDENTIFIER (COMMA IDENTIFIER)*)?;
 
-// Statements
+// --- Statements -------------------------------------------------------------
 
 body: LBRACE stmt* RBRACE;
 
-stmt: assignStmt | ifStmt | whileStmt | returnStmt;
+stmt:
+    assignStmt
+    | ifStmt
+    | whileStmt
+    | returnStmt
+;
 
 assignStmt: IDENTIFIER ASSIGN (expr | funcCall) SEMICOLON;
 
@@ -110,19 +90,29 @@ whileStmt: WHILE LPAR boolExpr RPAR body;
 
 returnStmt: RETURN expr SEMICOLON;
 
-// Call
+// --- Function calls ---------------------------------------------------------
 
 funcCall: IDENTIFIER LPAR arguments RPAR;
 
 arguments: (expr (COMMA expr)*)?;
 
-// Expressions
+// --- Expressions ------------------------------------------------------------
 
-expr: arithExpr | boolExpr;
+expr:
+    arithExpr
+    | boolExpr
+;
 
-arithExpr: noprnd | binArithOp;
+arithExpr:
+    noprnd
+    | binArithOp
+;
 
-boolExpr: boprnd | relOp | binLogicOp;
+boolExpr:
+    boprnd
+    | relOp
+    | binLogicOp
+;
 
 binArithOp: left = noprnd arithOp right = noprnd;
 
@@ -130,20 +120,38 @@ binLogicOp: left = noprnd logicOp right = noprnd;
 
 relOp: left = boprnd nop right = boprnd;
 
-noprnd: IDENTIFIER | NUM;
+noprnd:
+    IDENTIFIER
+    | NUM
+;
 
-boprnd: IDENTIFIER | TRUE | FALSE;
+boprnd:
+    IDENTIFIER
+    | TRUE
+    | FALSE
+;
 
-// Operators
+// --- Operators --------------------------------------------------------------
 
-arithOp: ADD | SUBSTRACT | MULTIPLY | DIVIDE;
+arithOp:
+    ADD
+    | SUBSTRACT
+    | MULTIPLY
+    | DIVIDE
+;
 
 logicOp:
-	LESS
-	| GREATER
-	| EQUAL
-	| NOT_EQUAL
-	| GREATER_EQUAL
-	| LESS_EQUAL;
+    LESS
+    | GREATER
+    | EQUAL
+    | NOT_EQUAL
+    | GREATER_EQUAL
+    | LESS_EQUAL
+;
 
-nop: EQUAL | NOT_EQUAL | AND | OR;
+nop:
+    EQUAL
+    | NOT_EQUAL
+    | AND
+    | OR
+;

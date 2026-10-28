@@ -44,3 +44,9 @@ bin/
 
 ### Drawio ###
 *.bkp
+
+### Development specific ###
+*/roadmap.md
+*/project_decisions.md
+
+.metals
