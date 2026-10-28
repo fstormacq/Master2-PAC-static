@@ -6,6 +6,14 @@ grammar SmallGrammar;
 // Lexer rules
 // ============================================================================
 
+// --- Types ------------------------------------------------------------------
+
+INT		      : 'int';
+BOOL          : 'bool';
+
+TYPE_ASSIGN	  : ':';
+TYPE_RETURN	  : '->';
+
 // --- Keywords ---------------------------------------------------------------
 
 IF            : 'if';
@@ -67,9 +75,11 @@ WS            : [ \t]+ -> skip;
 
 program: function*;
 
-function: FUNCTION IDENTIFIER LPAR parameters RPAR body;
+type: INT | BOOL;
 
-parameters: (IDENTIFIER (COMMA IDENTIFIER)*)?;
+function: FUNCTION IDENTIFIER LPAR parameters RPAR (TYPE_RETURN type)? body;
+
+parameters: (IDENTIFIER (TYPE_ASSIGN type)? (COMMA IDENTIFIER (TYPE_ASSIGN type)?)*)?;
 
 // --- Statements -------------------------------------------------------------
 
@@ -82,7 +92,7 @@ stmt:
     | returnStmt
 ;
 
-assignStmt: IDENTIFIER ASSIGN (expr | funcCall) SEMICOLON;
+assignStmt: IDENTIFIER (TYPE_ASSIGN type)? ASSIGN (expr | funcCall) SEMICOLON;
 
 ifStmt: IF LPAR boolExpr RPAR ifBody = body ELSE elseBody = body;
 
